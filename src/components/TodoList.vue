@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import type {Todo} from "@/schemas/todo.ts";
-import {Button} from "@/components/ui/button";
+import TodoItem from "@/components/TodoItem.vue";
+import AddTodo from "@/components/AddTodo.vue";
 
 const todos = ref<Todo[]>([])
 
 let id = 0;
-const newTodo = ref("")
 
-function addTodo() {
+function insertTodo(newTodoTxt: string) {
   todos.value.push({
     id: id++,
-    text: newTodo.value
+    text: newTodoTxt
   })
 
-  newTodo.value = ""
 }
 
-function removeTodo(id: number) {
-  todos.value = todos.value.filter(e => e.id !== id)
+function removeTodo(todo: Todo) {
+  todos.value = todos.value.filter(e => e.id !== todo.id)
+
 }
 
 </script>
@@ -26,10 +26,13 @@ function removeTodo(id: number) {
 <template>
   <div class="flex flex-col gap-4">
     <div class="text-xl">TODO list</div>
-    <form @submit.prevent="addTodo">
-      <input required v-model="newTodo" placeholder="add a new todo...">
-      <Button />
-    </form>
+    <AddTodo @on-add="(el) => insertTodo(el)"/>
+
+    <ul class="flex flex-col gap-4">
+      <li v-for="todo in todos" :key="todo.id">
+        <TodoItem :id="todo.id" :text="todo.text" @delete-todo="(el) => removeTodo(el)"/>
+      </li>
+    </ul>
   </div>
 </template>
 
